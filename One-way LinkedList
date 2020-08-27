@@ -1,0 +1,245 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+struct Node
+{
+	int index;
+	int data;    //数据域
+
+	struct Node* next;    //指针域
+};
+
+struct Node* head = NULL;
+struct Node* end = NULL;
+
+void Add_Node(int data);  /*创建链表*/
+void Scan_Node(void);  /*遍历链表*/
+struct Node* Find_Node(int index);  /*查找链表*/
+void Free_Node(void);  /*清空链表*/
+int rand_Node(int index, int data);  /*插入链表*/
+int Delete_Node(int index);  /*删除链表*/
+
+int main(void)
+{
+	int n;
+	int data, index;
+	struct Node* N;
+
+	printf("1创建链表 2遍历链表 3查找链表 4清空链表 5插入链表 6删除链表\n");
+
+	while (1)
+	{
+		printf("操作：");
+		scanf_s("%d", &n);
+
+		switch (n)
+		{
+		case 1:
+			printf("输入data值：");
+			scanf_s("%d", &data);
+
+			Add_Node(data);
+
+			break;
+		case 2:
+			Scan_Node();
+
+			break;
+		case 3:
+			printf("输入index值：");
+			scanf_s("%d", &index);
+
+			N = Find_Node(index);
+
+			if (N == NULL)
+				printf("没有指定节点\n");
+			else
+				printf("index:%d data:%d\n", N->index, N->data);
+
+			break;
+		case 4:
+			Free_Node();
+
+			printf("已清空！\n");
+
+			break;
+		case 5:
+			printf("输入index/data值：");
+			scanf_s("%d%d", &index, &data);
+
+			rand_Node(index, data);
+
+			break;
+		case 6:
+			printf("输入index值：");
+			scanf_s("%d", &index);
+
+			Delete_Node(index);
+
+			break;
+		default:
+			break;
+
+		}
+	}
+
+	return 0;
+}
+/*创建链表*/
+void Add_Node(int data)
+{
+	struct Node* temp = (struct Node*)malloc(sizeof(struct Node));  //定义临时指针，分配新链表内存
+
+	temp->data = data;  //传递数据
+	temp->next = NULL;  //指针指向空指针
+
+	if (head == NULL)  //当头部链表为空时
+	{
+		temp->index = 1;  //序号为1
+		head = temp;  //头部链表指向该链表
+	}
+	else  //当头部链表不为空时
+	{
+		temp->index = end->index + 1;  //序号为n+1
+		end->next = temp;  //末尾链表指针指向该链表
+	}
+
+	end = temp;  //新链表成为末尾链表
+}
+/*遍历链表*/
+void Scan_Node(void)
+{
+	struct Node* temp = head;  //定义临时指针指向头部链表
+
+	while (temp != NULL)  //当临时指针指向不为空时
+	{
+		printf("index:%d data:%d\n", temp->index, temp->data);  //输出数据域
+
+		temp = temp->next;  //临时指针指向链表指针
+	}
+}
+/*查找链表*/
+struct Node* Find_Node(int index)
+{
+	struct Node* temp = head;  //定义临时指针指向头部链表
+
+	while (temp != NULL)  //当临时指针指向不为空时
+	{
+		if (temp->index == index)  //当数据（学号，序号等）相等时
+			return temp; //返回指针地址
+		else
+			temp = temp->next;  //临时指针指向链表指针
+	}
+
+	return NULL;  //返回空地址
+}
+/*清空链表*/
+void Free_Node(void)
+{
+	struct Node* temp = head;  //定义临时指针指向头部链表
+
+	while (temp != NULL)  //当临时指针指向不为空时
+	{
+		struct Node* pt = temp;  //定义新指针指向当前链表
+
+		temp = temp->next;  //临时指针指向链表指针
+
+		free(pt);  //释放链表内存
+	}
+
+	head = NULL;  //头部链表指向空指针
+	end = NULL;  //末尾链表指向空指针
+}
+/*插入链表*/
+int rand_Node(int index, int data)
+{
+	if (head == NULL)  //当头部链表为空时
+	{
+		printf("链表没有节点\n");
+		return 0;
+	}
+
+	struct Node* pt = Find_Node(index);  //定义指针指向目标链表
+
+	if (pt == NULL)  //当返回值为空时
+	{
+		printf("没有指定节点\n");
+		return 0;
+	}
+
+	struct Node* temp = (struct Node*)malloc(sizeof(struct Node));  //定义临时指针，分配新链表内存
+
+	temp->index = pt->index + 1;  //序号为n+1
+	temp->data = data;  //传递数据
+	temp->next = NULL;  //指针指向空指针
+
+	if (pt == end)  //当目标链表为末尾链表时
+	{
+		end->next = temp;  //末尾链表指针指向该链表
+		end = temp;  //新链表成为末尾链表
+	}
+	else  //当目标链表不为末尾链表时
+	{
+		temp->next = pt->next;  //新链表指向目标链表连接的链表
+		pt->next = temp;  //目标链表指向新链表
+
+		pt = temp->next;  //临时指针指向下一链表
+
+		do
+		{
+			pt->index = pt->index + 1;  //下一链表的序号+1
+			pt = pt->next;  //临时指针指向下下一链表
+		} while (pt != NULL);  //临时指针不为空指针
+	}
+}
+/*删除链表*/
+int Delete_Node(int index)
+{
+	struct Node* temp = Find_Node(index);
+
+	if (temp == NULL)
+	{
+		printf("没有指定节点\n");
+		return 0;
+	}
+
+	struct Node* pt = NULL;
+
+	if (temp == head && temp == end)
+	{
+		Free_Node();
+
+		return 0;
+	}
+	else if (temp == head)
+	{
+		head = head->next;
+		pt = head;
+	}
+	else if (temp == end)
+	{
+		end = Find_Node(index - 1);
+		end->next = NULL;
+
+		free(temp);
+
+		return 0;
+	}
+	else
+	{
+		pt = Find_Node(index - 1);
+
+		pt->next = temp->next;
+		pt = pt->next;
+	}
+
+	while (pt != NULL)
+	{
+		pt->index = pt->index - 1;
+		pt = pt->next;
+	}
+
+	free(temp);
+
+	return 0;
+}
