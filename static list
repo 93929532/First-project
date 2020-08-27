@@ -1,0 +1,19 @@
+#include<stdio.h>
+
+struct Node
+{
+	int data;
+	struct Node* next;
+};
+
+int main(void)
+{
+	struct Node Node1 = { 1,NULL };    //这是静态链表
+	struct Node Node2 = { 2,NULL };    //并没有什么卵用
+	struct Node Node3 = { 3,NULL };
+
+	Node1.next = &Node2;
+	Node2.next = &Node3;
+
+	return 0;
+}
