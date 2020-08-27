@@ -1,0 +1,256 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+struct Node
+{
+	int index;
+	int data;    //数据域
+
+	struct Node* last;
+	struct Node* next;    //指针域
+};
+
+struct Node* head = NULL;
+
+void Add_Node(int data);  /*创建链表*/
+void Scanh_Node();  /*遍历链表（正）*/
+void Scane_Node();  /*遍历链表（反）*/
+struct Node* Find_Node(int index);  /*查找链表*/
+void Free_Node();  /*清空链表*/
+void rand_Node(int index,int data);  /*插入链表*/
+void Delete_Node(int index);  /*删除链表*/
+
+int main(void)
+{
+	int n;
+	int index,data;
+	struct Node* temp;
+
+	printf("创建链表1  遍历链表（正）2  遍历链表（反）3  查找链表4  清空链表5  插入链表6  删除链表7\n");
+	
+	while (1)
+	{
+		printf("操作：");
+		scanf_s("%d", &n);
+
+		switch (n)
+		{
+	    	case 1: 
+			{
+				printf("输入data值：");
+				scanf_s("%d", &data);
+
+				Add_Node(data);
+
+				break;
+			}
+			case 2:
+			{
+				Scanh_Node();
+
+				break;
+			}
+			case 3:
+			{
+				Scane_Node();
+
+				break;
+			}
+			case 4:
+			{
+				printf("输入index值：");
+				scanf_s("%d", &index);
+
+				temp = Find_Node(index);
+
+				if (temp != NULL)
+					printf("index:%d data:%d\n", temp->index, temp->data);
+				else
+					printf("没找到！\n");
+
+				break;
+			}
+			case 5:
+			{
+				Free_Node();
+				printf("已清空！\n");
+
+				break;
+			}
+			case 6:
+			{
+				printf("输入index/data值：");
+				scanf_s("%d%d", &index, &data);
+
+				rand_Node(index, data);
+				break;
+			}
+			case 7:
+			{
+				printf("输入index值：");
+				scanf_s("%d", &index);
+
+				Delete_Node(index);
+				break;
+			}
+			default:
+				break;
+		}
+	}
+
+	return 0;
+}
+/*创建链表*/
+void Add_Node(int data)
+{
+	struct Node* temp =(struct Node*)malloc(sizeof(struct Node));
+	
+
+	if (head == NULL)
+	{
+		temp->last = temp;
+		temp->next = temp;
+
+		temp->index = 1;
+		
+		head = temp;
+	}
+	else
+	{
+		struct Node* tp = head->last;
+
+		tp->next = temp;
+		temp->next = head;
+		head->last = temp;
+		temp->last = tp;
+
+		temp->index = tp->index + 1;
+	}
+
+	temp->data = data;
+}
+/*遍历链表（正）*/
+void Scanh_Node()
+{
+	if (head != NULL)
+	{
+		struct Node* temp = head;
+
+		do
+		{
+			printf("index:%d data:%d\n", temp->index, temp->data);
+			temp = temp->next;
+		} while (temp != head);
+	}
+	else
+		printf("链表为空！\n");
+}
+/*遍历链表（反）*/
+void Scane_Node()
+{
+	if (head != NULL)
+	{
+		struct Node* temp = head->last;
+
+		do
+		{
+			printf("index:%d data:%d\n", temp->index, temp->data);
+			temp = temp->last;
+		} while (temp != head->last);
+	}
+	else
+		printf("链表为空！\n");
+}
+/*查找链表*/
+struct Node* Find_Node(int index)
+{
+	struct Node* temp = head;
+
+	if (head == NULL)
+		return NULL;
+
+	do
+	{
+		if (temp->index == index)
+			return temp;
+		else
+			temp = temp->next;
+	}while (temp != head);
+
+	return NULL;
+}
+/*清空链表*/ 
+void Free_Node()
+{
+	if (head != NULL)
+	{
+		struct Node* temp = head->last;
+		struct Node* tp = NULL;
+
+		while (temp != head)
+		{
+			tp = temp;
+			temp = temp->last;
+			free(tp);
+		}
+
+		free(head);
+	}
+		
+	head = NULL;
+}
+/*插入链表*/
+void rand_Node(int index, int data)
+{
+	struct Node* temp = (struct Node*)malloc(sizeof(struct Node));
+	struct Node* tp1 = Find_Node(index);
+
+	if (tp1 == NULL)
+		printf("没找到！\n");
+	else
+	{
+		struct Node* tp2 = tp1->next;
+
+		tp1->next = temp;
+		temp->next = tp2;
+		tp2->last = temp;
+		temp->last = tp1;
+
+		temp->data = data;
+		temp->index = index;
+
+		do
+		{
+			temp->index = temp->index + 1;
+			temp = temp->next;
+		}while (temp != head);
+	}
+}
+/*删除链表*/
+void Delete_Node(int index)
+{
+	struct Node* temp = Find_Node(index);
+
+	if (temp == NULL)
+		printf("没找到！\n");
+	else
+	{
+		struct Node* tp1 = temp->last;
+		struct Node* tp2 = temp->next;
+
+		tp1->next = tp2;
+		tp2->last = tp1;
+
+		if (temp == head)
+			head = temp->next;
+
+		free(temp);
+		temp = tp2;
+
+		do
+		{
+			temp->index = temp->index - 1;
+			temp = temp->next;
+		}while (temp != head);
+	}
+}
